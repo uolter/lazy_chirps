@@ -20,8 +20,6 @@ access_token_secret = settings.access_token_secret
 api = tw.Api(consumer_key=consumer_key, consumer_secret=consumer_secret,
              access_token_key=access_token, access_token_secret=access_token_secret) 
 
-MY_ID = 32822337
-MY_NAME = u'Walter Traspadini'
 
 
 def str_to_date(str_date):
