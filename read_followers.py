@@ -1,42 +1,41 @@
 import twitter as tw
 import settings
 from datetime import datetime
+from api_init import  api
 
-consumer_key = settings.consumer_key
-consumer_secret = settings.consumer_secret
-access_token = settings.access_token
-access_token_secret = settings.access_token_secret
 
-api = tw.Api(consumer_key=consumer_key, consumer_secret=consumer_secret,
-             access_token_key=access_token, access_token_secret=access_token_secret) 
+def get_user_data(user):
+	_data = []
+	_data.append(user.name.encode('utf8'))
+	# follower_data.append(user.location.encode('utf8')) if f.location else follower_data.append(None)
+	_data.append(count_words(user.name))
+	_data.append(user.lang.encode('utf8'))
+	_data.append(int(user.statuses_count))
+	_data.append(int(user.followers_count))
+	_data.append(int(user.friends_count))
+	_data.append(int(user.favourites_count))
+	_data.append(int(user.listed_count))
 
+	return _data
 
 def get_followers_data():
 
 	'''
-		read data from your twitter followers and save them
-		to a csv file:
+	read data from your twitter followers and save them
+	to a csv file:
 	'''
 
-	followers = api.GetFollowers()
-
-	print "you have %d followers" %len(followers)
-
+	follower_ids = api.GetFollowerIDs()
 	followers_list = []
 
-	for f in followers:		
-		follower_data = []
-		follower_data.append(f.name.encode('utf8'))
-		# follower_data.append(f.location.encode('utf8')) if f.location else follower_data.append(None)
-		follower_data.append(count_words(f.name))
-		follower_data.append(f.lang.encode('utf8'))
-		follower_data.append(int(f.statuses_count))
-		follower_data.append(int(f.followers_count))
-		follower_data.append(int(f.friends_count))
-		follower_data.append(int(f.favourites_count))
-		follower_data.append(int(f.listed_count))
+	print 'processing %d followers.' %len(follower_ids['ids'])
 
-		followers_list.append(follower_data)
+	for id in follower_ids['ids']:
+		follower = api.GetUser(id)
+		try:
+			followers_list.append( get_user_data(follower))
+		except AttributeError:
+			print follower
 
 	return followers_list
 
@@ -54,7 +53,8 @@ def save_csv(file_name, data_list):
 				file_writer.writerow(user)
 			except UnicodeEncodeError, e:
 				print 'error saving user ', user
-				print e 
+				print e
+
 
 def count_words(text):
 	import re
@@ -68,7 +68,6 @@ if __name__ == '__main__':
 	print 'saving csv  ....'
 
 	save_csv('followers.csv', followers_data)
-
 
 	print 'saved !!'
 

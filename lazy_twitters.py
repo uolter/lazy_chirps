@@ -5,21 +5,16 @@ Created on Aug 10, 2012
 '''
 
 '''
-    look for users who don't tweeting for so long.
+    look for users who don't tweeting for a long time
 '''
 
 import twitter as tw
 import settings
 from datetime import datetime
+from api_init import api
 
-consumer_key = settings.consumer_key
-consumer_secret = settings.consumer_secret
-access_token = settings.access_token
-access_token_secret = settings.access_token_secret
 
-api = tw.Api(consumer_key=consumer_key, consumer_secret=consumer_secret,
-             access_token_key=access_token, access_token_secret=access_token_secret) 
-
+MAX_DAY_OLD_POST = 30 * 4
 
 
 def str_to_date(str_date):
@@ -37,15 +32,17 @@ def main():
 
     friend_ids = api.GetFriendIDs()
 
-    for f in friend_ids['ids']:
-        user = api.GetUser(f)
+    print 'you have %d friends' %len(friend_ids['ids'])
+
+    for fid in friend_ids['ids']:
+        user = api.GetUser(fid)
         try: 
             # how old was the last post?
             latest_status = user.status
             if latest_status:
                 days = is_old_days(str_to_date(latest_status.created_at))
                 
-                if days > 30 *5:
+                if days > MAX_DAY_OLD_POST:
                     # latest post is more than 6 months old.     
                     print '%s is more than %d months does not post messages' %(user.name, days/30)
             else:
