@@ -8,10 +8,8 @@ Created on Aug 10, 2012
     look for users who don't tweeting for a long time
 '''
 
-import twitter as tw
-import settings
 from datetime import datetime
-from api_init import api
+from utils.api_init import api
 
 
 MAX_DAY_OLD_POST = 30 * 4
