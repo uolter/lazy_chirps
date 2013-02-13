@@ -2,7 +2,7 @@ __author__ = 'uolter'
 
 from urllib import urlopen
 from bs4 import BeautifulSoup
-from api_init import api
+from utils.api_init import api
 import read_followers
 from urllib2 import URLError
 from twitter import TwitterError

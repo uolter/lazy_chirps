@@ -17,5 +17,4 @@ api = tw.Api(consumer_key=consumer_key,
             input_encoding=None,
             request_headers=None,
             cache=tw.DEFAULT_CACHE,
-            shortner=None,
-            base_url='https://api.twitter.com/1.1')
+            shortner=None)
