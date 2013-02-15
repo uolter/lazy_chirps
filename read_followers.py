@@ -1,15 +1,13 @@
-import twitter as tw
-import settings
-from datetime import datetime
-from api_init import  api
-
+from utils.api_init import  api
+from utils import file_utils
 
 def get_user_data(user):
+
 	_data = []
 	_data.append(user.name.encode('utf8'))
 	# follower_data.append(user.location.encode('utf8')) if f.location else follower_data.append(None)
 	_data.append(count_words(user.name))
-	_data.append(user.lang.encode('utf8'))
+	# _data.append(user.lang.encode('utf8'))
 	_data.append(int(user.statuses_count))
 	_data.append(int(user.followers_count))
 	_data.append(int(user.friends_count))
@@ -18,42 +16,39 @@ def get_user_data(user):
 
 	return _data
 
-def get_followers_data():
-
-	'''
-	read data from your twitter followers and save them
-	to a csv file:
-	'''
-
-	follower_ids = api.GetFollowerIDs()
-	followers_list = []
-
-	print 'processing %d followers.' %len(follower_ids['ids'])
-
-	for id in follower_ids['ids']:
-		follower = api.GetUser(id)
-		try:
-			followers_list.append( get_user_data(follower))
-		except AttributeError:
-			print follower
-
-	return followers_list
 
 
-def save_csv(file_name, data_list):
+def read_followers(user_name):
 
-	import csv 
 
-	with open(file_name, 'wb') as csv_file:
-		file_writer = csv.writer(csv_file)
+    # 1 get new data from twitter
 
-		for user in data_list:
-			print user
-			try:
-				file_writer.writerow(user)
-			except UnicodeEncodeError, e:
-				print 'error saving user ', user
-				print e
+
+    user = api.GetUser(user_name)
+
+    followers_id = api.GetFollowerIDs(user.id)
+
+    print '%s(%s) has %d followers ' %(user_name, user.id, len(followers_id['ids']))
+
+    user_data = []
+
+    for _id in  followers_id['ids']:
+        try:
+            print user.name, _id
+            # print read_followers.get_user_data(user)
+            user = api.GetUser(_id)
+            user_data.append(get_user_data(user))
+        except Exception, e:
+            print e
+            break
+
+
+    # 5 save the data to the csv file.
+
+    file_utils.save_csv('followers_%s.csv' %user_name, user_data)
+
+    return
+
 
 
 def count_words(text):
@@ -63,12 +58,9 @@ def count_words(text):
 
 if __name__ == '__main__':
 
-	followers_data = get_followers_data()
+    import sys
 
-	print 'saving csv  ....'
+    followers_data = read_followers(sys.argv[1])
 
-	save_csv('followers.csv', followers_data)
-
-	print 'saved !!'
-
+    print 'saved !!'
 
