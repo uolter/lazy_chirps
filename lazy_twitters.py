@@ -12,7 +12,7 @@ from datetime import datetime
 from utils.api_init import api
 
 
-MAX_DAY_OLD_POST = 30 * 4
+MAX_DAY_OLD_POST = 30 * 4 # 4 months
 
 
 def str_to_date(str_date):
@@ -28,23 +28,22 @@ def is_old_days(old_date):
 
 def main():
 
-    friend_ids = api.GetFriendIDs()
+    followers = api.GetFriends()
+    print 'you are following %d accounts' % len(followers)
 
-    print 'you have %d friends' %len(friend_ids['ids'])
-
-    for fid in friend_ids['ids']:
-        user = api.GetUser(fid)
+    for f in followers:
         try: 
             # how old was the last post?
-            latest_status = user.status
+            latest_status = f.GetStatus()
             if latest_status:
                 days = is_old_days(str_to_date(latest_status.created_at))
                 
                 if days > MAX_DAY_OLD_POST:
                     # latest post is more than 6 months old.     
-                    print '%s is more than %d months does not post messages' %(user.name, days/30)
+                    print '%s is more than %d months does not post messages' \
+                    % (f.GetName(), days/30)
             else:
-                print '%s never posted messages' %user.name
+                print '%s never posted messages' % f.GetName()
                 
         except TypeError:
             pass
